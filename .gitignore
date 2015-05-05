@@ -1,0 +1,61 @@
+;Chip Settings
+#chip 12F675,0
+
+;Defines (Constants)
+#define I2C_MODE Slave
+#define I2C_DATA GPIO.0
+#define I2C_CLOCK GPIO.1
+#define I2C_ADDRESS 96 ; 0x90 slave address
+#define SERVO_1 GPIO.2
+#define SERVO_2 GPIO.3
+#define SERVO_3 GPIO.4
+#define SERVO_4 GPIO.5
+
+;Variables
+Dim addr As byte
+Dim regval As byte
+Dim value As byte
+Dim servo_1 As byte
+Dim servo_2 As byte
+Dim servo_3 As byte
+Dim servo_4 As byte
+
+servo_1 = 150
+servo_2 = 150
+servo_3 = 150
+servo_4 = 150
+dir SERVO_1 out
+dir SERVO_2 out
+dir SERVO_3 out
+dir SERVO_4 out
+Do Forever
+	I2CStart
+	I2CReceive addr
+	if I2C_ADDRESS = addr then
+		I2CReceive regval		;receive servo number
+		I2CReceive value		;then servo position (75 - 225)
+		I2CStop
+	end if
+	case_1:
+	if regval = 1 then
+		servo_1 = value
+	end if
+	case_2:
+	if regval = 2 then
+		servo_2 = value
+	end if
+	case_3:
+	if regval = 3 then
+		servo_3 = value
+	end if
+	case_4:
+	if regval = 4 then
+		value = value
+	end if
+	doservos:
+	PulseOut SERVO_1, servo_1 10us
+	PulseOut SERVO_2, servo_2 10us
+	PulseOut SERVO_3, servo_3 10us
+	PulseOut SERVO_4, servo_4 10us
+	Wait 20 ms
+loop
